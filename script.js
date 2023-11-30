@@ -100,6 +100,14 @@ function resetGame() {
   computerScore.textContent = 'Computer: 0';
 }
 
+const h1Element = document.querySelector('h1');
+
+document.addEventListener('click', (event) => {
+  if (event.target !== h1Element) {
+    h1Element.style.display = 'none';
+  }
+});
+
 playSoundButton.addEventListener('click', () => {
     playSound(smashSound);
   });
