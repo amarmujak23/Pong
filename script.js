@@ -12,78 +12,79 @@ let computerScoreCount = 0;
 // Initial positions
 let ballX = 300;
 let ballY = 200;
-let ballSpeedX = -2;
-let ballSpeedY = 2;
+let ballSpeedX = -3;
+let ballSpeedY = 3;
 
 // Paddle positions
 let playerPaddleY = 160;
 let computerPaddleY = 160;
 
+const computerReactionSpeed = 0.05;
+
 function update() {
-    document.addEventListener('mousemove', (e) => {
-      playerPaddleY = e.clientY - playerPaddle.clientHeight / 2;
-      if (playerPaddleY < 0) {
-        playerPaddleY = 0;
-      } else if (playerPaddleY > 320) {
-        playerPaddleY = 320;
-      }
-      playerPaddle.style.top = `${playerPaddleY}px`;
-    });
-  
-    // Update ball position
-    ballX += ballSpeedX;
-    ballY += ballSpeedY;
-    ball.style.left = `${ballX}px`;
-    ball.style.top = `${ballY}px`;
-  
-    // Ball collision with walls
-    if (ballY <= 0 || ballY >= 390) {
-      ballSpeedY = -ballSpeedY;
+  document.addEventListener('mousemove', (e) => {
+    playerPaddleY = e.clientY - playerPaddle.clientHeight / 2;
+    if (playerPaddleY < 0) {
+      playerPaddleY = 0;
+    } else if (playerPaddleY > 320) {
+      playerPaddleY = 320;
     }
-  
-    // Ball collision with paddles
-    const playerPaddleHit = ballX <= 20 && ballX >= 10 && ballY >= playerPaddleY && ballY <= playerPaddleY + 80;
-    const computerPaddleHit = ballX >= 570 && ballX <= 580 && ballY >= computerPaddleY && ballY <= computerPaddleY + 80;
-  
-    if (playerPaddleHit || computerPaddleHit) {
-      ballSpeedX = -ballSpeedX;
-      playSound(smashSound);
-    }
-  
-    // Computer AI
-    if (ballX > 300) {
-      const computerPaddleCenter = computerPaddleY + 40; // Center of the computer's paddle
-      if (computerPaddleCenter < ballY - 15) {
-        computerPaddleY += 3; // Move paddle down if ball is above the center of the paddle
-      } else if (computerPaddleCenter > ballY + 15) {
-        computerPaddleY -= 3; // Move paddle up if ball is below the center of the paddle
-      }
-    }
-    computerPaddle.style.top = `${computerPaddleY}px`;
-  
-    // Score update
-    if (ballX <= 0) {
-      computerScoreCount++;
-      computerScore.textContent = `Computer: ${computerScoreCount}`;
-      reset();
-    } else if (ballX >= 590) {
-      playerScoreCount++;
-      playerScore.textContent = `Player: ${playerScoreCount}`;
-      reset();
-    }
-  
-    // Check for winner
-    if (playerScoreCount === 5) {
-      alert('Congratulations! You win!');
-      resetGame();
-    } else if (computerScoreCount === 5) {
-      alert('Computer wins! Try again.');
-      resetGame();
-    }
-  
-    requestAnimationFrame(update);
+    playerPaddle.style.top = `${playerPaddleY}px`;
+  });
+
+
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+  ball.style.left = `${ballX}px`;
+  ball.style.top = `${ballY}px`;
+
+
+  if (ballY <= 0 || ballY >= 390) {
+    ballSpeedY = -ballSpeedY;
   }
+
   
+  const playerPaddleHit = ballX <= 20 && ballX >= 10 && ballY >= playerPaddleY && ballY <= playerPaddleY + 80;
+  const computerPaddleHit = ballX >= 570 && ballX <= 580 && ballY >= computerPaddleY && ballY <= computerPaddleY + 80;
+
+  if (playerPaddleHit || computerPaddleHit) {
+    ballSpeedX = -ballSpeedX;
+    playSound(smashSound);
+  }
+
+  // Computer AI
+  if (ballX > 300) {
+    const computerPaddleCenter = computerPaddleY + 40; 
+    if (computerPaddleCenter < ballY - 15) {
+      computerPaddleY += Math.abs(ballY - computerPaddleCenter) * computerReactionSpeed; 
+    } else if (computerPaddleCenter > ballY + 15) {
+      computerPaddleY -= Math.abs(ballY - computerPaddleCenter) * computerReactionSpeed; 
+    }
+  }
+  computerPaddle.style.top = `${computerPaddleY}px`;
+
+  // Score update
+  if (ballX <= 0) {
+    computerScoreCount++;
+    computerScore.textContent = `Computer: ${computerScoreCount}`;
+    reset();
+  } else if (ballX >= 590) {
+    playerScoreCount++;
+    playerScore.textContent = `Player: ${playerScoreCount}`;
+    reset();
+  }
+
+  // Check for winner
+  if (playerScoreCount === 5) {
+    alert('Congratulations! You win!');
+    resetGame();
+  } else if (computerScoreCount === 5) {
+    alert('Computer wins! Try again.');
+    resetGame();
+  }
+
+  requestAnimationFrame(update);
+}
 
 function reset() {
   ballX = 300;
@@ -109,23 +110,21 @@ document.addEventListener('click', (event) => {
 });
 
 playSoundButton.addEventListener('click', () => {
-    playSound(smashSound);
-  });
-  
+  playSound(smashSound);
+});
 
 function playSound(sound) {
-    sound.currentTime = 0;
-    const playPromise = sound.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(_ => {
-          // Audio played successfully
-        })
-        .catch(error => {
-          console.error('Audio playback prevented:', error);
-          // Handle playback prevention - maybe display a message or take another action
-        });
-    }
+  sound.currentTime = 0;
+  const playPromise = sound.play();
+  if (playPromise !== undefined) {
+    playPromise
+      .then(_ => {
+        
+      })
+      .catch(error => {
+        console.error('Audio playback prevented:', error);
+      });
   }
+}
 
 update();
